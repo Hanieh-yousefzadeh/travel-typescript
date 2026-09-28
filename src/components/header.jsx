@@ -43,12 +43,20 @@ function Header() {
                     </NavLink>
                     {!user && (<Link to="/login" className="rounded-full bg-amber-50 pt-2 pb-3 px-7 hover:bg-[#072629ad] hover:text-amber-50"> Login</Link>)}
                     {user && (
-                        <div className="flex lg:gap-10 gap-5">
+                        <div className="flex lg:gap-10 gap-5 items-center">
                             <NavLink to="/profile" className={({ isActive }) => `flex gap-1 items-center  hover:border-b hover:border-b-[#072629] px-2 py-2 ${isActive ? " border-b border-b-[#072629]" : "text-[#072629]"}`}>
                                 {({ isActive }) => (
                                     <>
                                         <UserRound className={`lg:size-7  p-1 rounded-full text-[#072629ad] border-2  ${isActive ? "fill-[#072629ad]" : "fill-none"}`} strokeWidth={2} />
                                         My Account
+                                    </>
+                                )}
+                            </NavLink>
+                            <NavLink to="/myTrips" className={({ isActive }) => `flex gap-1 items-center  hover:border-b hover:border-b-[#072629] px-2 py-2 ${isActive ? " border-b border-b-[#072629]" : "text-[#072629]"}`}>
+                                {({ isActive }) => (
+                                    <>
+                                        <UserRound className={`lg:size-7  p-1 rounded-full text-[#072629ad] border-2  ${isActive ? "fill-[#072629ad]" : "fill-none"}`} strokeWidth={2} />
+                                        My Trips
                                     </>
                                 )}
                             </NavLink>

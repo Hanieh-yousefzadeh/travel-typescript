@@ -9,6 +9,7 @@ import { CountryContext } from "./context/countrycontext";
 import Header from "./components/header";
 import Footer from "./components/footer";
 import {AuthContext } from "./context/authcontect";
+import MyTravels from "./pages/mytravels";
 
 function App() {
 
@@ -73,7 +74,8 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/country/:id" element={<Weather />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/favorite/" element={<MyTrip />} />
+            <Route path="/favorite" element={<MyTrip />} />
+            <Route path="/myTrips" element={<MyTravels/>}/>
           </Routes>
         </CountryContext>
       </AuthContext>

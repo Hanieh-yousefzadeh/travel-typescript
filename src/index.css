@@ -1,6 +1,7 @@
 @import "tailwindcss";
-@plugin "daisyui"{
-     themes: light;
+
+@plugin "daisyui" {
+    themes: light;
 }
 
 ::-webkit-scrollbar {
