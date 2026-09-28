@@ -1,40 +1,17 @@
-import { useReducer, useState, useContext } from "react";
+import { useState, useContext } from "react";
 import { CountryContext } from "../context/countrycontext";
+import { Link } from "react-router";
+import { TripContext } from "../context/tripcontext";
 
-const initialState = { trips: [] };
-
-function reducer(state, action) {
-    switch (action.type) {
-        case "addTrip": {
-            return {
-                ...state,
-                trips: [...state.trips, action.payload]
-            }
-        }
-        case "deleteAllTrips": {
-            return {
-                ...state,
-                trips: []
-            }
-        }
-        case "editTrip": {
-            return {
-                ...state,
-                trips: state.trips.map((trip) => trip.id === action.payload.id ? action.payload : trip)
-            };
-        }
-        default: return state;
-    }
-}
 
 
 function MyTravels() {
 
-    const [state, dispatch] = useReducer(reducer, initialState)
+    const { countries } = useContext(CountryContext);
+    const { state, dispatch } = useContext(TripContext);
+
 
     const [isModalOpen, setIsModalOpen] = useState(false)
-    const { countries } = useContext(CountryContext);
-
     function openModal() {
         setIsModalOpen(true)
     }
@@ -269,6 +246,7 @@ function MyTravels() {
                                 ))}
                             </div>
                         </div>
+                        <Link to={`/myTrips/${trip.id}`} className="mt-5" > View Trip → </Link>
                     </div>
                 ))}
             </div>
