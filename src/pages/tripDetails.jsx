@@ -18,6 +18,7 @@ function TripDetails() {
     const [expenseAmount, setExpenseAmount] = useState("");
     const [expensePaidBy, setExpensePaidBy] = useState("");
     const [editingExpenseId, setEditingExpenseId] = useState(null);
+    const [selectedCategory, setSelectedCategory] = useState("all");
 
     function handleShowExpense() {
         setIsExpenseModalOpen(true)
@@ -39,6 +40,9 @@ function TripDetails() {
 
     function handleExpensePaidBy(e) {
         setExpensePaidBy(e.target.value)
+    }
+    function selectCategory(e) {
+        setSelectedCategory(e.target.value)
     }
 
 
@@ -92,6 +96,14 @@ function TripDetails() {
         });
 
     }
+    function deleteAllEXpense() {
+        dispatch({
+            type: "deleteAllExpenses",
+            payload: {
+                tripId: trip.id
+            }
+        });
+    }
     function editExpense(expense) {
         setEditingExpenseId(expense.id);
 
@@ -103,11 +115,17 @@ function TripDetails() {
         setIsExpenseModalOpen(true);
     }
 
-
+    const filteredExpenses = selectedCategory === "all" ? trip.expenses || [] : (trip.expenses || []).filter((expense) => expense.category === selectedCategory);
 
     return (
         <div>
             <h1>Trip Details</h1>
+            <button className="btn" onClick={deleteAllEXpense} > Delete All </button>
+            <select value={selectedCategory} onChange={selectCategory} className="select bg-[#F1EEE2]">
+                <option value="all"> All categories </option>
+                {categories.map((category) => (<option key={category} value={category} > {category}</option>
+                ))}
+            </select>
             <h2> Destination :{trip.country}</h2>
 
             <div className="flex">
@@ -165,11 +183,11 @@ function TripDetails() {
                 <h2 className="text-2xl font-bold">Expenses </h2>
                 <p>Total Expenses:{" "} {totalExpenses.toLocaleString()} Toman</p>
 
-                {trip.expenses?.length === 0 ? (<p className="mt-4">No expenses yet.</p>) : (
+                {filteredExpenses.length === 0 ? (<p className="mt-4">No expenses yet.</p>) : (
 
                     <div className="">
 
-                        {trip.expenses.map((expense) => (
+                        {filteredExpenses.map((expense) => (
 
                             <div key={expense.id} className="border">
 

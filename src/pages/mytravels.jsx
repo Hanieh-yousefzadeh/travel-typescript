@@ -26,6 +26,9 @@ function MyTravels() {
     const [activities, setActivities] = useState([]);
 
     const [activityInput, setActivityInput] = useState("");
+    const [filterCountry, setFilterCountry] = useState("");
+
+    const filteredTrips = filterCountry ? state.trips.filter((trip) => trip.country === filterCountry) : state.trips;
 
     const user = JSON.parse(localStorage.getItem("user"));
     const [person, setPerson] = useState([{
@@ -74,7 +77,7 @@ function MyTravels() {
         setActivities((prev) => prev.filter((item) => item.id !== id));
     }
 
-    function handleSelect(e) {
+    function handleSelectCard(e) {
         setCountry(e.target.value)
     }
     function handleBudget(e) {
@@ -86,6 +89,10 @@ function MyTravels() {
     }
     function handleActivityInput(e) {
         setActivityInput(e.target.value)
+    }
+
+    function selectCountry(e) {
+        setFilterCountry(e.target.value)
     }
 
 
@@ -115,8 +122,8 @@ function MyTravels() {
                 country,
                 people: person,
                 budget: Number(budget),
-                activities ,
-                  expenses: []
+                activities,
+                expenses: []
             };
 
             dispatch({
@@ -127,6 +134,10 @@ function MyTravels() {
 
         setIsModalOpen(false);
         setEditingTripId(null);
+        setCountry("");
+        setBudget("");
+        setPersonInput("");
+        setActivityInput("");
     }
 
     function deleteAllTrips() {
@@ -151,6 +162,11 @@ function MyTravels() {
     return (
         <section>
             <button className="btn" onClick={openModal}>Add Trip</button>
+            <select className="select select-bordered bg-[#F1EEE2]" value={filterCountry} onChange={selectCountry}>
+                <option value="">All Countries</option>
+                {countries.map((country) => (<option key={country.numericCode} value={country.name} > {country.name}</option>
+                ))}
+            </select>
             {state.trips.length > 0 && (
                 <button className="btn btn-error" onClick={deleteAllTrips} > Delete All Trips </button>
             )}
@@ -162,7 +178,7 @@ function MyTravels() {
                             <div className="flex gap-2">
                                 <label> <span>Where do you want to go?</span> </label>
 
-                                <select className="select select-bordered bg-[#F1EEE2]" value={country} onChange={handleSelect}>
+                                <select className="select select-bordered bg-[#F1EEE2]" value={country} onChange={handleSelectCard}>
                                     <option value=""> Select country </option>
                                     {countries.map((country) => (
                                         <option key={country.numericCode} value={country.name} > {country.name} </option>
@@ -222,7 +238,7 @@ function MyTravels() {
                 </dialog>
             )}
             <div className="grid gap-5 mt-8">
-                {state.trips.map((trip) => (
+                {filteredTrips.map((trip) => (
                     <div key={trip.id} className="card bg-[#F1EEE2] shadow-md p-5" >
 
                         <h2 className="text-2xl font-bold"> {trip.country} </h2>
