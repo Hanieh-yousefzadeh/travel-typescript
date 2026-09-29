@@ -26,7 +26,19 @@ function reducer(state, action) {
         case "addExpense": {
             return {
                 ...state,
-                trips: state.trips.map((trip) => trip.id === action.payload.tripId  ? {...trip ,expenses: [ ...(trip.expenses || []), action.payload.expense ] } : trip )
+                trips: state.trips.map((trip) => trip.id === action.payload.tripId ? { ...trip, expenses: [...(trip.expenses || []), action.payload.expense] } : trip)
+            };
+        }
+        case "deleteExpense": {
+            return {
+                ...state,
+                trips: state.trips.map((trip) => trip.id === action.payload.tripId ? { ...trip, expenses: trip.expenses.filter((expense) => expense.id !== action.payload.expenseId) } : trip)
+            };
+        }
+        case "editExpense": {
+            return {
+                ...state,
+                trips: state.trips.map((trip) =>trip.id === action.payload.tripId ? { ...trip, expenses: trip.expenses.map((expense) => expense.id === action.payload.expense.id ? action.payload.expense : expense ) } : trip )
             };
         }
         default: return state;

@@ -17,6 +17,7 @@ function TripDetails() {
     const [expenseCategory, setExpenseCategory] = useState("");
     const [expenseAmount, setExpenseAmount] = useState("");
     const [expensePaidBy, setExpensePaidBy] = useState("");
+    const [editingExpenseId, setEditingExpenseId] = useState(null);
 
     function handleShowExpense() {
         setIsExpenseModalOpen(true)
@@ -42,6 +43,7 @@ function TripDetails() {
 
 
 
+
     const trip = state.trips.find((trip) => trip.id === Number(tripId));
     // console.log(trip);
     console.log(trip.expenses);
@@ -52,7 +54,7 @@ function TripDetails() {
     function addExpense() {
 
         const newExpense = {
-            id: Date.now(),
+            id: editingExpenseId ? editingExpenseId : Date.now(),
             title: expenseTitle,
             category: expenseCategory,
             amount: Number(expenseAmount),
@@ -62,7 +64,7 @@ function TripDetails() {
         // console.log(newExpense);
 
         dispatch({
-            type: "addExpense",
+            type: editingExpenseId !== null ? "editExpense" : "addExpense",
             payload: {
                 tripId: trip.id,
                 expense: newExpense
@@ -76,6 +78,31 @@ function TripDetails() {
 
         setIsExpenseModalOpen(false);
     }
+
+    const totalExpenses = (trip.expenses || []).reduce((total, expense) => total + expense.amount, 0);
+    const remainingBudget = trip.budget - totalExpenses;
+
+    function deleteExpense(expenseId) {
+        dispatch({
+            type: "deleteExpense",
+            payload: {
+                tripId: trip.id,
+                expenseId: expenseId
+            }
+        });
+
+    }
+    function editExpense(expense) {
+        setEditingExpenseId(expense.id);
+
+        setExpenseTitle(expense.title);
+        setExpenseCategory(expense.category);
+        setExpenseAmount(expense.amount);
+        setExpensePaidBy(expense.paidBy);
+
+        setIsExpenseModalOpen(true);
+    }
+
 
 
     return (
@@ -99,7 +126,7 @@ function TripDetails() {
                 <dialog id="my_modal_5" className="modal modal-open modal-bottom sm:modal-middle">
                     <div className="modal-box bg-white">
 
-                        <h3 className="text-xl font-bold"> Add Expense </h3>
+                        <h3 className="text-xl font-bold"> {editingExpenseId !== null ? "Edit Expense" : "Add Expense"}</h3>
 
                         <div>
                             <label className=""> What did you spend on? </label>
@@ -127,12 +154,42 @@ function TripDetails() {
 
                         <div className="modal-action mt-20">
                             <button className="btn " onClick={closeModal} >  Cancel </button>
-                            <button className="btn" onClick={addExpense}>  Add Expense</button>
+                            <button className="btn" onClick={addExpense}>  {editingExpenseId !== null ? "Save Changes" : "Add Expense"}</button>
                         </div>
 
                     </div>
                 </dialog>
             )}
+            <div className="">
+
+                <h2 className="text-2xl font-bold">Expenses </h2>
+                <p>Total Expenses:{" "} {totalExpenses.toLocaleString()} Toman</p>
+
+                {trip.expenses?.length === 0 ? (<p className="mt-4">No expenses yet.</p>) : (
+
+                    <div className="">
+
+                        {trip.expenses.map((expense) => (
+
+                            <div key={expense.id} className="border">
+
+                                <h3 className="font-bold">{expense.title} </h3>
+                                <p> Category: {expense.category} </p>
+                                <p> Amount:{" "}{expense.amount.toLocaleString()} Toman</p>
+                                <p> Paid by: {expense.paidBy}</p>
+                                <p>Remaining Budget:{" "}{remainingBudget.toLocaleString()} Toman</p>
+
+                                <div className="flex gap-3">
+                                    <button className="btn" onClick={() => editExpense(expense)}>Edit</button>
+                                    <button className="btn" onClick={() => deleteExpense(expense.id)}>Delete </button>
+
+                                </div>
+                            </div>
+
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
