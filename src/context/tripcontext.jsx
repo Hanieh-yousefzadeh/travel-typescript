@@ -23,6 +23,12 @@ function reducer(state, action) {
                 trips: state.trips.map((trip) => trip.id === action.payload.id ? action.payload : trip)
             };
         }
+        case "addExpense": {
+            return {
+                ...state,
+                trips: state.trips.map((trip) => trip.id === action.payload.tripId  ? {...trip ,expenses: [ ...(trip.expenses || []), action.payload.expense ] } : trip )
+            };
+        }
         default: return state;
     }
 }

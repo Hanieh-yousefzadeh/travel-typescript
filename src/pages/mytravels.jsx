@@ -115,7 +115,8 @@ function MyTravels() {
                 country,
                 people: person,
                 budget: Number(budget),
-                activities
+                activities ,
+                  expenses: []
             };
 
             dispatch({
