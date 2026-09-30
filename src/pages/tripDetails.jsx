@@ -50,7 +50,7 @@ function TripDetails() {
 
     const trip = state.trips.find((trip) => trip.id === Number(tripId));
     // console.log(trip);
-    console.log(trip.expenses);
+    // console.log(trip.expenses);
     if (!trip) {
         return <p>Trip not found.</p>;
     }
@@ -58,7 +58,7 @@ function TripDetails() {
     function addExpense() {
 
         const newExpense = {
-            id: editingExpenseId ? editingExpenseId : Date.now(),
+            id: editingExpenseId !== null ? editingExpenseId : Date.now(),
             title: expenseTitle,
             category: expenseCategory,
             amount: Number(expenseAmount),

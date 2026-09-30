@@ -1,7 +1,7 @@
-import { createContext, useReducer } from "react";
+import { createContext, useReducer ,useEffect } from "react";
 export const TripContext = createContext();
 
-const initialState = { trips: [] };
+const initialState = { trips: JSON.parse(localStorage.getItem("trips")) || [] };
 
 function reducer(state, action) {
     switch (action.type) {
@@ -44,12 +44,15 @@ function reducer(state, action) {
         case "deleteAllExpenses": {
             return {
                 ...state,
-                trips: state.trips.map((trip) => trip.id === action.payload.tripId ? { ...trip, expenses: [] } : trip )
+                trips: state.trips.map((trip) => trip.id === action.payload.tripId ? { ...trip, expenses: [] } : trip)
             };
         }
         default: return state;
     }
 }
+
+useEffect(() => {localStorage.setItem("trips", JSON.stringify(state.trips));
+}, [state.trips]);
 
 
 export function TripProvider({ children }) {
