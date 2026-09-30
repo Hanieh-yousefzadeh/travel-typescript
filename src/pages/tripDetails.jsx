@@ -57,6 +57,26 @@ function TripDetails() {
 
     function addExpense() {
 
+        if (!expenseTitle.trim()) {
+            alert("Please enter expense title");
+            return;
+        }
+
+        if (!expenseCategory) {
+            alert("Please select a category");
+            return;
+        }
+
+        if (!expenseAmount || Number(expenseAmount) <= 0) {
+            alert("Please enter a valid amount");
+            return;
+        }
+
+        if (!expensePaidBy) {
+            alert("Please select who paid");
+            return;
+        }
+
         const newExpense = {
             id: editingExpenseId !== null ? editingExpenseId : Date.now(),
             title: expenseTitle,
