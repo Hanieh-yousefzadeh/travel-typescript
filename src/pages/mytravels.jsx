@@ -1,40 +1,17 @@
-import { useReducer, useState, useContext } from "react";
+import { useState, useContext } from "react";
 import { CountryContext } from "../context/countrycontext";
+import { Link } from "react-router";
+import { TripContext } from "../context/tripcontext";
 
-const initialState = { trips: [] };
-
-function reducer(state, action) {
-    switch (action.type) {
-        case "addTrip": {
-            return {
-                ...state,
-                trips: [...state.trips, action.payload]
-            }
-        }
-        case "deleteAllTrips": {
-            return {
-                ...state,
-                trips: []
-            }
-        }
-        case "editTrip": {
-            return {
-                ...state,
-                trips: state.trips.map((trip) => trip.id === action.payload.id ? action.payload : trip)
-            };
-        }
-        default: return state;
-    }
-}
 
 
 function MyTravels() {
 
-    const [state, dispatch] = useReducer(reducer, initialState)
+    const { countries } = useContext(CountryContext);
+    const { state, dispatch } = useContext(TripContext);
+
 
     const [isModalOpen, setIsModalOpen] = useState(false)
-    const { countries } = useContext(CountryContext);
-
     function openModal() {
         setIsModalOpen(true)
     }
@@ -49,6 +26,9 @@ function MyTravels() {
     const [activities, setActivities] = useState([]);
 
     const [activityInput, setActivityInput] = useState("");
+    const [filterCountry, setFilterCountry] = useState("");
+
+    const filteredTrips = filterCountry ? state.trips.filter((trip) => trip.country === filterCountry) : state.trips;
 
     const user = JSON.parse(localStorage.getItem("user"));
     const [person, setPerson] = useState([{
@@ -97,7 +77,7 @@ function MyTravels() {
         setActivities((prev) => prev.filter((item) => item.id !== id));
     }
 
-    function handleSelect(e) {
+    function handleSelectCard(e) {
         setCountry(e.target.value)
     }
     function handleBudget(e) {
@@ -111,169 +91,198 @@ function MyTravels() {
         setActivityInput(e.target.value)
     }
 
+    function selectCountry(e) {
+        setFilterCountry(e.target.value)
+    }
+
 
 
 
     function saveTrip() {
 
-        if (editingTripId) {
+        if (!country) {
+            alert("Please select a country");
+            return;
+        }
 
-            const updatedTrip = {
-                id: editingTripId,
-                country,
-                people: person,
-                budget: Number(budget),
-                activities
-            };
+        if (!budget || Number(budget) <= 0) {
+            alert("Please enter a valid budget");
+            return;
+        }
 
+        if (activities.length === 0) {
+            alert("Please add at least one activity");
+            return;
+        }
+            if (editingTripId) {
+
+                const updatedTrip = {
+                    id: editingTripId,
+                    country,
+                    people: person,
+                    budget: Number(budget),
+                    activities
+                };
+
+                dispatch({
+                    type: "editTrip",
+                    payload: updatedTrip
+                });
+
+            } else {
+
+                const newTrip = {
+                    id: Date.now(),
+                    country,
+                    people: person,
+                    budget: Number(budget),
+                    activities,
+                    expenses: []
+                };
+
+                dispatch({
+                    type: "addTrip",
+                    payload: newTrip
+                });
+            }
+
+            setIsModalOpen(false);
+            setEditingTripId(null);
+            setCountry("");
+            setBudget("");
+            setPersonInput("");
+            setActivityInput("");
+        }
+
+        function deleteAllTrips() {
             dispatch({
-                type: "editTrip",
-                payload: updatedTrip
-            });
-
-        } else {
-
-            const newTrip = {
-                id: Date.now(),
-                country,
-                people: person,
-                budget: Number(budget),
-                activities
-            };
-
-            dispatch({
-                type: "addTrip",
-                payload: newTrip
+                type: "deleteAllTrips"
             });
         }
 
-        setIsModalOpen(false);
-        setEditingTripId(null);
-    }
+        function editTrip(trip) {
+            setEditingTripId(trip.id);
 
-    function deleteAllTrips() {
-        dispatch({
-            type: "deleteAllTrips"
-        });
-    }
+            setCountry(trip.country);
+            setBudget(trip.budget);
+            setPerson(trip.people);
+            setActivities(trip.activities);
 
-    function editTrip(trip) {
-        setEditingTripId(trip.id);
-
-        setCountry(trip.country);
-        setBudget(trip.budget);
-        setPerson(trip.people);
-        setActivities(trip.activities);
-
-        setIsModalOpen(true);
-    }
+            setIsModalOpen(true);
+        }
 
 
 
-    return (
-        <section>
-            <button className="btn" onClick={openModal}>Add Trip</button>
-            {state.trips.length > 0 && (
-                <button className="btn btn-error" onClick={deleteAllTrips} > Delete All Trips </button>
-            )}
-            {isModalOpen && (
-                <dialog id="my_modal_4" className="modal modal-open ">
-                    <div className="modal-box w-11/12 max-w-5xl bg-white">
+        return (
+            <section>
+                <button className="btn" onClick={openModal}>Add Trip</button>
+                <select className="select select-bordered bg-[#F1EEE2]" value={filterCountry} onChange={selectCountry}>
+                    <option value="">All Countries</option>
+                    {countries.map((country) => (<option key={country.numericCode} value={country.name} > {country.name}</option>
+                    ))}
+                </select>
+                {state.trips.length > 0 && (
+                    <button className="btn btn-error" onClick={deleteAllTrips} > Delete All Trips </button>
+                )}
+                {isModalOpen && (
+                    <dialog id="my_modal_4" className="modal modal-open ">
+                        <div className="modal-box w-11/12 max-w-5xl bg-white">
 
-                        <div className="grid gap-5">
-                            <div className="flex gap-2">
-                                <label> <span>Where do you want to go?</span> </label>
+                            <div className="grid gap-5">
+                                <div className="flex gap-2">
+                                    <label> <span>Where do you want to go?</span> </label>
 
-                                <select className="select select-bordered bg-[#F1EEE2]" value={country} onChange={handleSelect}>
-                                    <option value=""> Select country </option>
-                                    {countries.map((country) => (
-                                        <option key={country.numericCode} value={country.name} > {country.name} </option>
-                                    ))}
-                                </select>
+                                    <select className="select select-bordered bg-[#F1EEE2]" value={country} onChange={handleSelectCard}>
+                                        <option value=""> Select country </option>
+                                        {countries.map((country) => (
+                                            <option key={country.numericCode} value={country.name} > {country.name} </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+
+
+                                <div className="">
+                                    <label><span> Budget (Toman) </span></label>
+                                    <input type="number" placeholder="5000000000" className="input input-bordered bg-[#F1EEE2]" value={budget} onChange={handleBudget} />
+
+                                </div>
+
+                                <div>
+                                    <label><span>Who is traveling?</span> </label>
+                                    <input type="text" placeholder="e.g. ghazal" className="input input-bordered bg-[#F1EEE2]" value={personInput} onChange={handlePersonInput} />
+                                    <button className="btn ml-5" onClick={addPerson}> Add </button>
+                                    <div className="flex gap-3 mt-2">
+                                        {person.map((person, index) => (
+
+                                            <div key={person.id} className="badge badge-lg gap-5 p-3 bg-[#F1EEE2]">
+
+                                                {person.name}
+                                                {index !== 0 && (
+                                                    <button type="button" onClick={() => deletePerson(person.id)} > × </button>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="">
+                                    <label><span>What do you want to do?</span> </label>
+                                    <input type="text" placeholder="e.g. Museum" className="input input-bordered  bg-[#F1EEE2]" value={activityInput} onChange={handleActivityInput} />
+                                    <button type="button" className="btn ml-5" onClick={addActivity} > Add </button>
+                                    <div className=" flex gap-3">
+                                        {activities.map((activity) => (
+                                            <div key={activity.id} className="badge badge-lg  gap-5 p-3 bg-[#F1EEE2]">
+                                                {activity.title}
+                                                <button type="button" onClick={() => deleteActivitychip(activity.id)}> × </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div className="modal-action">
+                                <button onClick={saveTrip} className="btn">{editingTripId ? "Save Changes" : "Add Trip"} </button>
+                                <button className="btn" onClick={closeModal}>Close</button>
                             </div>
 
 
+                        </div>
+                    </dialog>
+                )}
+                <div className="grid gap-5 mt-8">
+                    {filteredTrips.map((trip) => (
+                        <div key={trip.id} className="card bg-[#F1EEE2] shadow-md p-5" >
 
-                            <div className="">
-                                <label><span> Budget (Toman) </span></label>
-                                <input type="number" placeholder="5000000000" className="input input-bordered bg-[#F1EEE2]" value={budget} onChange={handleBudget} />
+                            <h2 className="text-2xl font-bold"> {trip.country} </h2>
+                            <button className="btn btn-sm" onClick={() => editTrip(trip)} > Edit </button>
+                            <p className="mt-2"> Budget: {trip.budget.toLocaleString()} Toman </p>
 
-                            </div>
-
-                            <div>
-                                <label><span>Who is traveling?</span> </label>
-                                <input type="text" placeholder="e.g. ghazal" className="input input-bordered bg-[#F1EEE2]" value={personInput} onChange={handlePersonInput} />
-                                <button className="btn ml-5" onClick={addPerson}> Add </button>
-                                <div className="flex gap-3 mt-2">
-                                    {person.map((person, index) => (
-
-                                        <div key={person.id} className="badge badge-lg gap-5 p-3 bg-[#F1EEE2]">
-
-                                            {person.name}
-                                            {index !== 0 && (
-                                                <button type="button" onClick={() => deletePerson(person.id)} > × </button>
-                                            )}
-                                        </div>
+                            <div className="mt-3 ">
+                                <p className="font-semibold"> People: </p>
+                                <div className="flex gap-2 mt-2">
+                                    {trip.people.map((person) => (
+                                        <span key={person.id} className="badge bg-white"> {person.name} </span>
                                     ))}
                                 </div>
                             </div>
 
-                            <div className="">
-                                <label><span>What do you want to do?</span> </label>
-                                <input type="text" placeholder="e.g. Museum" className="input input-bordered  bg-[#F1EEE2]" value={activityInput} onChange={handleActivityInput} />
-                                <button type="button" className="btn ml-5" onClick={addActivity} > Add </button>
-                                <div className=" flex gap-3">
-                                    {activities.map((activity) => (
-                                        <div key={activity.id} className="badge badge-lg  gap-5 p-3 bg-[#F1EEE2]">
-                                            {activity.title}
-                                            <button type="button" onClick={() => deleteActivitychip(activity.id)}> × </button>
-                                        </div>
+                            <div className="mt-3">
+
+                                <p className="font-semibold"> Activities: </p>
+                                <div className="flex gap-2 mt-2">
+                                    {trip.activities.map((activity) => (
+                                        <span key={activity.id} className="badge bg-white" >{activity.title}</span>
                                     ))}
                                 </div>
                             </div>
-
+                            <Link to={`/myTrips/${trip.id}`} className="mt-5" > View Trip → </Link>
                         </div>
-
-                        <div className="modal-action">
-                            <button onClick={saveTrip} className="btn">{editingTripId ? "Save Changes" : "Add Trip"} </button>
-                            <button className="btn" onClick={closeModal}>Close</button>
-                        </div>
-
-
-                    </div>
-                </dialog>
-            )}
-            <div className="grid gap-5 mt-8">
-                {state.trips.map((trip) => (
-                    <div key={trip.id} className="card bg-[#F1EEE2] shadow-md p-5" >
-
-                        <h2 className="text-2xl font-bold"> {trip.country} </h2>
-                        <button className="btn btn-sm" onClick={() => editTrip(trip)} > Edit </button>
-                        <p className="mt-2"> Budget: {trip.budget.toLocaleString()} Toman </p>
-
-                        <div className="mt-3 ">
-                            <p className="font-semibold"> People: </p>
-                            <div className="flex gap-2 mt-2">
-                                {trip.people.map((person) => (
-                                    <span key={person.id} className="badge bg-white"> {person.name} </span>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="mt-3">
-
-                            <p className="font-semibold"> Activities: </p>
-                            <div className="flex gap-2 mt-2">
-                                {trip.activities.map((activity) => (
-                                    <span key={activity.id} className="badge bg-white" >{activity.title}</span>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </section>
-    )
-}
-export default MyTravels;
+                    ))}
+                </div>
+            </section>
+        )
+    }
+    export default MyTravels;
 
