@@ -2,7 +2,7 @@ import { useState, useContext } from "react";
 import { CountryContext } from "../context/countrycontext";
 import { Link } from "react-router";
 import { TripContext } from "../context/tripcontext";
-import { Plus, Trash, PencilSparkles ,MoveRight } from "lucide-react"
+import { Plus, Trash, PencilSparkles, MoveRight } from "lucide-react"
 
 
 
@@ -130,6 +130,12 @@ function MyTravels() {
 
 
     }
+    function deleteTrip(id) {
+        dispatch({
+            type: "deleteTrip",
+            payload: id
+        });
+    }
 
     function deleteAllTrips() {
         dispatch({
@@ -151,7 +157,7 @@ function MyTravels() {
 
     return (
         <section className="xl:min-h-160 min-h-105 px-5 py-15  xl:py-15 items-start bg-[#e9f2e95e] xl:px-12">
-            <div className="flex sm:flex-row flex-col xl:pr-10  xl:pl-120">
+            <div className="flex sm:flex-row flex-col xl:pr-10  ">
                 <button className="bg-[#EBE6D4] self-start rounded-lg text-[#072629] px-5 py-2  sm:mr-5 cursor-pointer font-semibold hover:bg-[#072629ad] hover:text-amber-50 text-lg" onClick={openModal}>Add Trip</button>
 
                 {state.trips.length > 0 && (
@@ -228,7 +234,12 @@ function MyTravels() {
 
                         <div className="flex justify-between">
                             <h2 className="text-2xl font-bold "> {trip.country} </h2>
-                            <button className="flex gap-2 sm:mt-0 mt-2 " onClick={() => editTrip(trip)} ><PencilSparkles className="size-5 cursor-pointer hover:fill-[#07262976]" /><Trash className="size-5 cursor-pointer hover:fill-[#07262976]"/></button>
+
+                            <div className="flex gap-2 sm:mt-0 mt-2 ">
+                                <button onClick={() => editTrip(trip)} ><PencilSparkles className="size-5 cursor-pointer hover:fill-[#07262976]" /></button>
+                                <button onClick={() => deleteTrip(trip.id)}> <Trash className="size-5 cursor-pointer hover:fill-[#07262976]" /></button>
+                            </div>
+
                         </div>
                         <p className="mt-5 font-medium text-[#072629d0]"> Budget : {trip.budget.toLocaleString()} T </p>
 
@@ -241,7 +252,7 @@ function MyTravels() {
                             </div>
                         </div>
 
-                        <Link to={`/myTrips/${trip.id}`} className="mt-5 font-semibold flex  items-center gap-1 self-end" > View Trip <MoveRight className="size-4.5 pt-1"/> </Link>
+                        <Link to={`/myTrips/${trip.id}`} className="mt-5 font-semibold flex  items-center gap-1 self-end" > View Trip <MoveRight className="size-4.5 pt-1" /> </Link>
                     </div>
 
                 ))}
