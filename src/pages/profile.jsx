@@ -7,7 +7,7 @@ function Profile() {
     console.log(user);
 
     return (
-        <section className="min-h-159 flex flex-col sm:pt-20 pt-10 items-center">
+        <section className="min-h-159 flex flex-col sm:pt-20 pt-10 items-center bg-[#e9f2e95e]">
             <h1 className="sm:text-2xl text-lg font-sans font-semibold text-[#072629] pb-10">Personal Information</h1>
             <div className="sm:flex-row flex flex-col lg:p-15 p-5 lg:gap-15 gap-7 bg-[#E9F2E9] rounded-2xl">
                 <span className="sm:px-7 sm:pt-6 rounded-2xl bg-[#fffbebc0]"><CircleUserRound className="sm:size-55 size-40 text-[#072629ad] sm:pl-0 pl-7" strokeWidth={0.8} /></span>

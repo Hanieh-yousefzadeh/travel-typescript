@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { Link, useNavigate, NavLink } from "react-router";
 import { AuthContext } from "../context/authcontect";
-import { UserRound, Heart, TextAlignJustify, X, MapPinned } from "lucide-react"
+import { UserRound, Heart, TextAlignJustify, X, MapPinned ,Tickets} from "lucide-react"
 import { CountryContext } from "../context/countrycontext";
 
 function Header() {
@@ -55,12 +55,12 @@ function Header() {
                             <NavLink to="/myTrips" className={({ isActive }) => `flex gap-1 items-center  hover:border-b hover:border-b-[#072629] px-2 py-2 ${isActive ? " border-b border-b-[#072629]" : "text-[#072629]"}`}>
                                 {({ isActive }) => (
                                     <>
-                                        <UserRound className={`lg:size-7  p-1 rounded-full text-[#072629ad] border-2  ${isActive ? "fill-[#072629ad]" : "fill-none"}`} strokeWidth={2} />
+                                        <Tickets className={`lg:size-7  p-1 rounded-full text-[#072629ad] border-2  ${isActive ? "fill-[#072629ad]" : "fill-none"}`} strokeWidth={2} />
                                         My Trips
                                     </>
                                 )}
                             </NavLink>
-                            <button onClick={handelLog} className="rounded-full bg-amber-50 sm:pt-1 sm:pb-2 sm:px-5  hover:bg-[#072629] hover:text-amber-50">Logout</button>
+                            <button onClick={handelLog} className="rounded-full bg-amber-50 sm:pt-1 sm:pb-2 sm:px-5  hover:bg-[#072629ad] hover:text-amber-50">Logout</button>
                         </div>)}
                 </div>
             </div >

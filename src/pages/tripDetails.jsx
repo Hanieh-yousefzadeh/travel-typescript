@@ -154,10 +154,6 @@ function TripDetails() {
             </div>
             <p> Budget: {trip.budget.toLocaleString()} Toman</p>
 
-            <div className="flex">
-                <h3>Activities :</h3>
-                {trip.activities.map((activity) => (<span key={activity.id} > {activity.title}</span>))}
-            </div>
             <button className="btn " onClick={handleShowExpense}>  + Add Expense </button>
 
             {isExpenseModalOpen && (
@@ -201,6 +197,7 @@ function TripDetails() {
             <div className="">
 
                 <h2 className="text-2xl font-bold">Expenses </h2>
+                 <p>Remaining Budget:{" "}{remainingBudget.toLocaleString()} Toman</p>
                 <p>Total Expenses:{" "} {totalExpenses.toLocaleString()} Toman</p>
 
                 {filteredExpenses.length === 0 ? (<p className="mt-4">No expenses yet.</p>) : (
@@ -215,7 +212,7 @@ function TripDetails() {
                                 <p> Category: {expense.category} </p>
                                 <p> Amount:{" "}{expense.amount.toLocaleString()} Toman</p>
                                 <p> Paid by: {expense.paidBy}</p>
-                                <p>Remaining Budget:{" "}{remainingBudget.toLocaleString()} Toman</p>
+                               
 
                                 <div className="flex gap-3">
                                     <button className="btn" onClick={() => editExpense(expense)}>Edit</button>
