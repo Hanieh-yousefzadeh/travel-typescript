@@ -23,6 +23,13 @@ function reducer(state, action) {
                 trips: state.trips.map((trip) => trip.id === action.payload.id ? action.payload : trip)
             };
         }
+        case "deleteTrip":
+            return {
+                ...state,
+                trips: state.trips.filter(
+                    (trip) => trip.id !== action.payload
+                )
+            };
         case "addExpense": {
             return {
                 ...state,
