@@ -1,7 +1,7 @@
 import { createContext, useReducer, useEffect } from "react";
 export const TripContext = createContext();
 
-const initialState = { trips: JSON.parse(localStorage.getItem("trips")) || [] };
+const initialState = { trips: JSON.parse(localStorage.getItem("trips")) || [], deletedTrips: null, deletedExpenses: null };
 
 function reducer(state, action) {
     switch (action.type) {
@@ -14,8 +14,16 @@ function reducer(state, action) {
         case "deleteAllTrips": {
             return {
                 ...state,
+                deletedTrips: state.trips,
                 trips: []
-            }
+            };
+        }
+        case "undoDeleteAllTrips": {
+            return {
+                ...state,
+                trips: state.deletedTrips || [],
+                deletedTrips: null,
+            };
         }
         case "editTrip": {
             return {
@@ -49,9 +57,31 @@ function reducer(state, action) {
             };
         }
         case "deleteAllExpenses": {
+            const trip = state.trips.find((trip) => trip.id === action.payload.tripId)
+
             return {
                 ...state,
-                trips: state.trips.map((trip) => trip.id === action.payload.tripId ? { ...trip, expenses: [] } : trip)
+
+                deletedExpenses: {
+                    tripId: action.payload.tripId,
+                    expenses: trip.expenses || []
+                },
+
+                trips: state.trips.map((trip) =>
+                    trip.id === action.payload.tripId ? { ...trip, expenses: [] } : trip
+                )
+            };
+        }
+        case "undoDeleteAllExpenses": {
+
+            return {
+                ...state,
+
+                trips: state.trips.map((trip) => trip.id === state.deletedExpenses.tripId ? {
+                            ...trip,
+                            expenses: state.deletedExpenses.expenses
+                        } : trip
+                ), deletedExpenses: null
             };
         }
         default: return state;
