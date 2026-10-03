@@ -19,6 +19,7 @@ function TripDetails() {
     const [expensePaidBy, setExpensePaidBy] = useState("");
     const [editingExpenseId, setEditingExpenseId] = useState(null);
     const [selectedCategory, setSelectedCategory] = useState("all");
+    const [selectedPerson, setSelectedPerson] = useState("all");
 
     function handleShowExpense() {
         setIsExpenseModalOpen(true)
@@ -43,6 +44,11 @@ function TripDetails() {
     }
     function selectCategory(e) {
         setSelectedCategory(e.target.value)
+        setSelectedPerson("all")
+    }
+    function selectPerson(e) {
+        setSelectedPerson(e.target.value)
+        setSelectedCategory("all")
     }
 
 
@@ -135,8 +141,18 @@ function TripDetails() {
         setIsExpenseModalOpen(true);
     }
 
-    const filteredExpenses = selectedCategory === "all" ? trip.expenses || [] : (trip.expenses || []).filter((expense) => expense.category === selectedCategory);
+    let filteredExpenses = trip.expenses || [];
 
+    if (selectedCategory !== "all") {
+        filteredExpenses = filteredExpenses.filter(
+            (expense) => expense.category === selectedCategory
+        );
+    }
+    if (selectedPerson !== "all") {
+        filteredExpenses = filteredExpenses.filter(
+            (expense) => expense.paidBy === selectedPerson
+        );
+    }
     return (
         <div>
             <h1>Trip Details</h1>
@@ -144,6 +160,11 @@ function TripDetails() {
             <select value={selectedCategory} onChange={selectCategory} className="select bg-[#F1EEE2]">
                 <option value="all"> All categories </option>
                 {categories.map((category) => (<option key={category} value={category} > {category}</option>
+                ))}
+            </select>
+            <select value={selectedPerson} onChange={selectPerson} className="select bg-[#F1EEE2]">
+                <option value="all">All people </option>
+                {trip.people.map((person) => (<option key={person.id} value={person.name} > {person.name}</option>
                 ))}
             </select>
             <h2> Destination :{trip.country}</h2>
@@ -197,7 +218,7 @@ function TripDetails() {
             <div className="">
 
                 <h2 className="text-2xl font-bold">Expenses </h2>
-                 <p>Remaining Budget:{" "}{remainingBudget.toLocaleString()} Toman</p>
+                <p>Remaining Budget:{" "}{remainingBudget.toLocaleString()} Toman</p>
                 <p>Total Expenses:{" "} {totalExpenses.toLocaleString()} Toman</p>
 
                 {filteredExpenses.length === 0 ? (<p className="mt-4">No expenses yet.</p>) : (
@@ -212,7 +233,7 @@ function TripDetails() {
                                 <p> Category: {expense.category} </p>
                                 <p> Amount:{" "}{expense.amount.toLocaleString()} Toman</p>
                                 <p> Paid by: {expense.paidBy}</p>
-                               
+
 
                                 <div className="flex gap-3">
                                     <button className="btn" onClick={() => editExpense(expense)}>Edit</button>
@@ -224,6 +245,8 @@ function TripDetails() {
                         ))}
                     </div>
                 )}
+
+
             </div>
         </div>
     );
