@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import { useParams } from "react-router";
 import { TripContext } from "../context/tripcontext";
 import { categories } from "../data/categoris";
+import { Trash, PencilSparkles, Ticket, Banknote } from "lucide-react"
 
 
 function TripDetails() {
@@ -105,6 +106,7 @@ function TripDetails() {
         setExpenseCategory("");
         setExpenseAmount("");
         setExpensePaidBy("");
+        setEditingExpenseId(null);
 
         setIsExpenseModalOpen(false);
     }
@@ -154,62 +156,92 @@ function TripDetails() {
         );
     }
     return (
-        <div>
-            <h1>Trip Details</h1>
-            <button className="btn" onClick={deleteAllEXpense} > Delete All </button>
-            <select value={selectedCategory} onChange={selectCategory} className="select bg-[#F1EEE2]">
-                <option value="all"> All categories </option>
-                {categories.map((category) => (<option key={category} value={category} > {category}</option>
-                ))}
-            </select>
-            <select value={selectedPerson} onChange={selectPerson} className="select bg-[#F1EEE2]">
-                <option value="all">All people </option>
-                {trip.people.map((person) => (<option key={person.id} value={person.name} > {person.name}</option>
-                ))}
-            </select>
-            <h2> Destination :{trip.country}</h2>
+        <div className="min-h-160 bg-[#F7FAF7]">
 
-            <div className="flex">
-                <h3>People :</h3>
-                {trip.people.map((person) => (<span key={person.id}> {person.name} </span>))}
+            <div className="flex  gap-2 justify-center py-15">
+                <button className="bg-[#F1EEE2] self-start rounded-lg text-[#072629] px-5 py-2  cursor-pointer font-semibold hover:bg-[#072629ad] hover:text-amber-50 text-lg" onClick={handleShowExpense}>  Add Expense </button>
+
+                <select value={selectedCategory} onChange={selectCategory} className="select select-bordered  w-35 sm:h-11 rounded-lg bg-[#F1EEE2]">
+                    <option value="all"> All categories </option>
+                    {categories.map((category) => (<option key={category} value={category} > {category}</option>
+                    ))}
+                </select>
+
+
+                <select value={selectedPerson} onChange={selectPerson} className="select select-bordered  w-35 sm:h-11 rounded-lg bg-[#F1EEE2]">
+                    <option value="all">All people </option>
+                    {trip.people.map((person) => (<option key={person.id} value={person.name} > {person.name}</option>
+                    ))}
+                </select>
+                <button className="border-2 border-[#e9e3cae9] sm:mt-0.5 mt-1.5 text-[#072629c5] rounded-lg self-start sm:h-10 sm:px-2   hover:bg-[#e9e3cae9] " onClick={deleteAllEXpense} > <Trash className="hover:fill-[#07262976] cursor-pointer sm:p-0 p-1" /></button>
             </div>
-            <p> Budget: {trip.budget.toLocaleString()} Toman</p>
 
-            <button className="btn " onClick={handleShowExpense}>  + Add Expense </button>
+
+            <div className="flex px-10 gap-7 ">
+                <div className="flex-1">
+                    <div className="card bg-[#F1EEE2] rounded-xl shadow-md p-5  text-[#072629] gap-1 flex flex-row justify-between border-2 border-[#F1EEE2]" >
+                        <div>
+                            <h2 className="font-bold text-[#072629d0] text-lg"> Destination : {trip.country}</h2>
+                            <p className="font-medium text-[#072629b3]"> Budget: {trip.budget.toLocaleString()} T</p>
+                            <div className=" flex items-baseline font-medium text-[#072629b3]">
+                                <h3 className="font-semibold">People :</h3>
+                                <div className="flex gap-2 pl-2">
+                                    {trip.people.map((person) => (<span key={person.id}> {person.name} </span>))}
+                                </div>
+                            </div>
+                        </div>
+                        <Ticket className="size-18 mt-2 text-[#0726298f] fill-[#F7FAF7]" strokeWidth={1.5} />
+
+                    </div>
+
+                </div>
+                <div className="flex-1 border-2 bg-[#F1EEE2] border-[#F1EEE2] rounded-xl p-5 gap-1 flex justify-between">
+                    <div className="flex flex-col">
+                        <h2 className="text-lg font-bold text-[#072629d0]">Expenses </h2>
+                        <p className="font-medium text-[#072629d0]">Total Expenses :{" "} {totalExpenses.toLocaleString()} T</p>
+                        <p className="font-medium text-red-950">Remaining Budget :{" "}{remainingBudget.toLocaleString()} T</p>
+                    </div>
+                    <Banknote className="size-18 mt-2 text-[#072629d0] fill-[#F7FAF7]" strokeWidth={1.5}/>
+                </div>
+                
+
+            </div>
+
 
             {isExpenseModalOpen && (
-                <dialog id="my_modal_5" className="modal modal-open modal-bottom sm:modal-middle">
-                    <div className="modal-box bg-white">
+                <dialog id="my_modal_5" className="modal modal-open modal-bottom sm:modal-middle ">
+                    <div className="modal-box w-11/12 max-w-2xl  bg-white rounded-2xl text-[#072629] grid gap-3">
 
-                        <h3 className="text-xl font-bold"> {editingExpenseId !== null ? "Edit Expense" : "Add Expense"}</h3>
+                        <h3 className="text-xl font-bold pb-5">Expense Details</h3>
 
-                        <div>
-                            <label className=""> What did you spend on? </label>
-                            <input type="text" className="input input-bordered" placeholder="e.g. Dinner" value={expenseTitle} onChange={inputExpenseTitle} />
+                        <div className="flex gap-3">
+                            <label className="sm:text-base text-xs pt-1"> What did you spend on? </label>
+                            <input type="text" className="input input-bordered rounded-lg bg-[#f1eee2b3] sm:placeholder:text-base placeholder:text-xs" placeholder="e.g. Dinner" value={expenseTitle} onChange={inputExpenseTitle} />
                         </div>
-                        <div>
-                            <label className=""> Category</label>
+                        <div className="flex gap-3">
+                            <label className="sm:text-base text-xs pt-1"> Category</label>
 
-                            <select className="select select-bordered bg-[#F1EEE2]" value={expenseCategory} onChange={handleExpenseCategory} >
+                            <select className="select select-bordered rounded-lg bg-[#f1eee2f4] sm:text-base text-xs" value={expenseCategory} onChange={handleExpenseCategory} >
                                 <option value=""> Select category </option>
                                 {categories.map((category) => (<option key={category} value={category} className="">{category} </option>))}
                             </select>
                         </div>
-                        <div>
-                            <label className=""> Amount (Toman)</label>
-                            <input type="number" className="input input-bordered " placeholder="200,000,000" value={expenseAmount} onChange={handleExpenseAmount} />
+                        <div className="flex gap-3">
+                            <label className="sm:text-base text-xs pt-1"> Amount (Toman)</label>
+                            <input type="number" className="input input-bordered rounded-lg bg-[#f1eee2b3] sm:placeholder:text-base placeholder:text-xs" placeholder="200,000,000" value={expenseAmount} onChange={handleExpenseAmount} />
                         </div>
-                        <div>
-                            <label className=""> Who paid? </label>
-                            <select className="select select-bordered bg-[#F1EEE2]" value={expensePaidBy} onChange={handleExpensePaidBy}>
+                        <div className="flex gap-3">
+                            <label className="sm:text-base text-xs pt-1"> Who paid? </label>
+                            <select className="select select-bordered rounded-lg bg-[#f1eee2f4] sm:text-base text-xs" value={expensePaidBy} onChange={handleExpensePaidBy}>
                                 <option value="">  Select person</option>
                                 {trip.people.map((person) => (<option key={person.id} value={person.name} > {person.name} </option>))}
                             </select>
                         </div>
 
-                        <div className="modal-action mt-20">
-                            <button className="btn " onClick={closeModal} >  Cancel </button>
-                            <button className="btn" onClick={addExpense}>  {editingExpenseId !== null ? "Save Changes" : "Add Expense"}</button>
+                        <div className="modal-action mt-7">
+
+                            <button className="font-semibold border-[#e9e3ca] border-3 rounded-lg px-2 pb-1.5 pt-1 text-[#072629c8] hover:bg-[#072629ad] hover:border-[#07262919] hover:text-amber-50 sm:text-base text-xs" onClick={addExpense}>  {editingExpenseId !== null ? "Save Changes" : "Add Expense"}</button>
+                            <button className="font-semibold border-[#e9e3ca] border-3 rounded-lg px-4 pb-1.5 pt-1 text-[#072629c8] hover:bg-[#072629ad] hover:border-[#07262919] hover:text-amber-50 sm:text-base text-xs" onClick={closeModal} >  Cancel </button>
                         </div>
 
                     </div>
@@ -217,29 +249,26 @@ function TripDetails() {
             )}
             <div className="">
 
-                <h2 className="text-2xl font-bold">Expenses </h2>
-                <p>Remaining Budget:{" "}{remainingBudget.toLocaleString()} Toman</p>
-                <p>Total Expenses:{" "} {totalExpenses.toLocaleString()} Toman</p>
 
-                {filteredExpenses.length === 0 ? (<p className="mt-4">No expenses yet.</p>) : (
+                {filteredExpenses.length === 0 ? (<p className="text-center text-xl font-medium text-[#072629d0] pt-15">No expenses yet.</p>) : (
 
-                    <div className="">
+                    <div className=" p-10 grid sm:grid-cols-3 grid-cols-1 gap-5">
 
                         {filteredExpenses.map((expense) => (
 
-                            <div key={expense.id} className="border">
+                            <div key={expense.id} className="card bg-[#F1EEE2] rounded-xl shadow-md p-5  text-[#072629]" >
 
-                                <h3 className="font-bold">{expense.title} </h3>
-                                <p> Category: {expense.category} </p>
-                                <p> Amount:{" "}{expense.amount.toLocaleString()} Toman</p>
-                                <p> Paid by: {expense.paidBy}</p>
-
-
-                                <div className="flex gap-3">
-                                    <button className="btn" onClick={() => editExpense(expense)}>Edit</button>
-                                    <button className="btn" onClick={() => deleteExpense(expense.id)}>Delete </button>
-
+                                <div className="flex justify-between">
+                                    <h3 className="text-2xl font-bold "> {expense.title} </h3>
+                                    <div className="flex gap-2 sm:mt-0 mt-2 ">
+                                        <button onClick={() => editExpense(expense)} ><PencilSparkles className="size-5 cursor-pointer hover:fill-[#07262976]" /></button>
+                                        <button onClick={() => deleteExpense(expense.id)}> <Trash className="size-5 cursor-pointer hover:fill-[#07262976]" /></button>
+                                    </div>
                                 </div>
+
+                                <p className="font-medium text-[#072629b3]"> Category : {expense.category} </p>
+                                <p className="font-medium text-[#072629b3]"> Amount :{" "}{expense.amount.toLocaleString()} Toman</p>
+                                <p className="font-medium text-[#072629b3]"> Paid by : {expense.paidBy}</p>
                             </div>
 
                         ))}

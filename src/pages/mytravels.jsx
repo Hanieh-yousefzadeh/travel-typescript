@@ -162,7 +162,7 @@ function MyTravels() {
 
                 {state.trips.length > 0 && (
                     <div className="flex sm:gap-0 gap-2 sm:mt-0 mt-5">
-                        <select className="select select-bordered sm:w-auto w-35 sm:h-11 rounded-lg bg-[#F1EEE2]" value={filterCountry} onChange={selectCountry}>
+                        <select className="select select-bordered  w-35 sm:h-11 rounded-lg bg-[#F1EEE2]" value={filterCountry} onChange={selectCountry}>
                             <option value="">All Countries</option>
                             {countries.map((country) => (<option key={country.numericCode} value={country.name} > {country.name}</option>
                             ))}
