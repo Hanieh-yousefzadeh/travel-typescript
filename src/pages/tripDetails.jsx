@@ -21,6 +21,7 @@ function TripDetails() {
     const [editingExpenseId, setEditingExpenseId] = useState(null);
     const [selectedCategory, setSelectedCategory] = useState("all");
     const [selectedPerson, setSelectedPerson] = useState("all");
+    const [showUndo, setShowUndo] = useState(false);
 
     function handleShowExpense() {
         setIsExpenseModalOpen(true)
@@ -130,7 +131,11 @@ function TripDetails() {
             payload: {
                 tripId: trip.id
             }
-        });
+        })
+        setShowUndo(true);
+        setTimeout(() => {
+            setShowUndo(false);
+        }, 3000);
     }
     function editExpense(expense) {
         setEditingExpenseId(expense.id);
@@ -155,20 +160,25 @@ function TripDetails() {
             (expense) => expense.paidBy === selectedPerson
         );
     }
+    const handleUndo = () => {
+        dispatch({ type: "undoDeleteAllExpenses" });
+        setShowUndo(false);
+
+    };
     return (
-        <div className="min-h-160 bg-[#F7FAF7]">
+        <div className="sm:min-h-160 min-h-180 bg-[#F7FAF7] px-5">
+            <button className=" sm:hidden mt-7 mb-5 ml-15  bg-[#F1EEE2] self-start rounded-lg text-[#072629] px-5 py-2  cursor-pointer font-semibold hover:bg-[#072629ad] hover:text-amber-50 text-lg" onClick={handleShowExpense}>  Add Expense </button>
+            <div className="flex  sm:gap-2 gap-1.5 justify-center sm:py-15">
+                <button className="hidden sm:flex bg-[#F1EEE2] self-start rounded-lg text-[#072629] px-5 py-2  cursor-pointer font-semibold hover:bg-[#072629ad] hover:text-amber-50 text-lg" onClick={handleShowExpense}>  Add Expense </button>
 
-            <div className="flex  gap-2 justify-center py-15">
-                <button className="bg-[#F1EEE2] self-start rounded-lg text-[#072629] px-5 py-2  cursor-pointer font-semibold hover:bg-[#072629ad] hover:text-amber-50 text-lg" onClick={handleShowExpense}>  Add Expense </button>
-
-                <select value={selectedCategory} onChange={selectCategory} className="select select-bordered  w-35 sm:h-11 rounded-lg bg-[#F1EEE2]">
+                <select value={selectedCategory} onChange={selectCategory} className="select select-bordered  w-35  sm:h-11 rounded-lg bg-[#F1EEE2]">
                     <option value="all"> All categories </option>
                     {categories.map((category) => (<option key={category} value={category} > {category}</option>
                     ))}
                 </select>
 
 
-                <select value={selectedPerson} onChange={selectPerson} className="select select-bordered  w-35 sm:h-11 rounded-lg bg-[#F1EEE2]">
+                <select value={selectedPerson} onChange={selectPerson} className="select select-bordered  sm:w-35 w-29 sm:h-11 rounded-lg bg-[#F1EEE2]">
                     <option value="all">All people </option>
                     {trip.people.map((person) => (<option key={person.id} value={person.name} > {person.name}</option>
                     ))}
@@ -176,15 +186,22 @@ function TripDetails() {
                 <button className="border-2 border-[#e9e3cae9] sm:mt-0.5 mt-1.5 text-[#072629c5] rounded-lg self-start sm:h-10 sm:px-2   hover:bg-[#e9e3cae9] " onClick={deleteAllEXpense} > <Trash className="hover:fill-[#07262976] cursor-pointer sm:p-0 p-1" /></button>
             </div>
 
-
-            <div className="flex px-10 gap-7 ">
+            {showUndo && (
+                <div className="toast toast-end">
+                    <div className="border-[#e9e3ca] border-3 rounded-lg px-4 py-5">
+                        <span className="pr-5">All Expenses Deleted.</span>
+                        <button className="font-semibold border-[#e9e3ca] border-3 rounded-lg px-3 pb-1.5 pt-1 text-[#072629c8] hover:bg-[#072629ad] hover:border-[#07262919] hover:text-amber-50 sm:text-sm text-xs" onClick={handleUndo}> Undo </button>
+                    </div>
+                </div>
+            )}
+            <div className="flex sm:flex-row flex-col sm:px-10 gap-7  sm:mt-0 mt-10">
                 <div className="flex-1">
-                    <div className="card bg-[#F1EEE2] rounded-xl shadow-md p-5  text-[#072629] gap-1 flex flex-row justify-between border-2 border-[#F1EEE2]" >
+                    <div className="card bg-[#F1EEE2] rounded-xl shadow-md p-5  text-[#072629] gap-1 flex flex-row justify-between border-2 border-[#F1EEE2] " >
                         <div>
-                            <h2 className="font-bold text-[#072629d0] text-lg"> Destination : {trip.country}</h2>
-                            <p className="font-medium text-[#072629b3]"> Budget: {trip.budget.toLocaleString()} T</p>
+                            <h2 className="font-bold text-[#072629d0] sm:text-lg text-xs sm:mb-0 mb-2"> Destination : {trip.country}</h2>
+                            <p className="font-medium text-[#072629b3] sm:text-base text-sm"> Budget: {trip.budget.toLocaleString()} T</p>
                             <div className=" flex items-baseline font-medium text-[#072629b3]">
-                                <h3 className="font-semibold">People :</h3>
+                                <h3 className="font-semibold sm:text-base text-sm">People :</h3>
                                 <div className="flex gap-2 pl-2">
                                     {trip.people.map((person) => (<span key={person.id}> {person.name} </span>))}
                                 </div>
@@ -201,9 +218,9 @@ function TripDetails() {
                         <p className="font-medium text-[#072629d0]">Total Expenses :{" "} {totalExpenses.toLocaleString()} T</p>
                         <p className="font-medium text-red-950">Remaining Budget :{" "}{remainingBudget.toLocaleString()} T</p>
                     </div>
-                    <Banknote className="size-18 mt-2 text-[#072629d0] fill-[#F7FAF7]" strokeWidth={1.5}/>
+                    <Banknote className="size-18 mt-2 text-[#072629d0] fill-[#F7FAF7]" strokeWidth={1.5} />
                 </div>
-                
+
 
             </div>
 

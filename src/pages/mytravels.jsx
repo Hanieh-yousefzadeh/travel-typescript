@@ -37,6 +37,7 @@ function MyTravels() {
     const [personInput, setPersonInput] = useState("");
 
     const [editingTripId, setEditingTripId] = useState(null);
+    const [showUndo, setShowUndo] = useState(false);
 
     function addPerson() {
         if (!personInput.trim()) {
@@ -141,7 +142,16 @@ function MyTravels() {
         dispatch({
             type: "deleteAllTrips"
         });
+        setShowUndo(true);
+        setTimeout(() => {
+            setShowUndo(false);
+        }, 3000);
     }
+    const handleUndo = () => {
+        dispatch({ type: "undoDeleteAllTrips" });
+        setShowUndo(false);
+
+    };
 
     function editTrip(trip) {
         setEditingTripId(trip.id);
@@ -172,6 +182,14 @@ function MyTravels() {
 
                 )}
             </div>
+            {showUndo && (
+                <div className="toast toast-end">
+                    <div className="border-[#e9e3ca] border-3 rounded-lg px-4 py-5">
+                        <span className="pr-5">All Trip Deleted.</span>
+                        <button className="font-semibold border-[#e9e3ca] border-3 rounded-lg px-3 pb-1.5 pt-1 text-[#072629c8] hover:bg-[#072629ad] hover:border-[#07262919] hover:text-amber-50 sm:text-sm text-xs" onClick={handleUndo}> Undo </button>
+                    </div>
+                </div>
+            )}
             {isModalOpen && (
                 <dialog id="my_modal_4" className="modal modal-open">
                     <div className="modal-box w-11/12 max-w-5xl bg-white rounded-2xl text-[#072629]">
