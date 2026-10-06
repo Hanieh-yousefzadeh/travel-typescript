@@ -1,4 +1,4 @@
-import { createContext, useReducer, useEffect, type Dispatch ,type ReactNode } from "react";
+import { createContext, useReducer,useContext, useEffect, type Dispatch ,type ReactNode } from "react";
 
 type Expense = {
     id: number;
@@ -9,10 +9,13 @@ type Expense = {
 }
 
 
-type Trip = {
+export type Trip = {
     id: number;
     country: string;
-    people: string[];
+    people: {
+        id :number;
+        name : string
+    }[];
     budget: number;
     expenses: Expense[]
 }
@@ -56,7 +59,7 @@ type Action =
         }}
     | { type: "undoDeleteAllExpenses" }
 
-type TripContextType = {
+export type TripContextType = {
     state: State;
     dispatch: Dispatch<Action>
 }
@@ -175,4 +178,12 @@ export function TripProvider({ children} :{ children: ReactNode }) {
             {children}
         </TripContext>
     );
+}
+export function useTripContext() {
+    const context = useContext(TripContext);
+
+    if (!context) {
+        throw new Error("useTripContext must be used inside TripProvider" );
+    }
+    return context;
 }

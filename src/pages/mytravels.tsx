@@ -1,15 +1,15 @@
-import { useState, useContext } from "react";
-import { CountryContext } from "../context/countrycontext";
+import { useState} from "react";
+import { useCountryContext } from "../context/countrycontext";
 import { Link } from "react-router";
-import { TripContext } from "../context/tripcontext";
+import { useTripContext, type Trip } from "../context/tripcontext";
 import { Plus, Trash, PencilSparkles, MoveRight } from "lucide-react"
 
 
 
 function MyTravels() {
 
-    const { countries } = useContext(CountryContext);
-    const { state, dispatch } = useContext(TripContext);
+    const { countries } = useCountryContext();
+    const { state, dispatch } = useTripContext();
 
 
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -27,16 +27,19 @@ function MyTravels() {
     const [filterCountry, setFilterCountry] = useState("");
 
     const filteredTrips = filterCountry ? state.trips.filter((trip) => trip.country === filterCountry) : state.trips;
-
-    const user = JSON.parse(localStorage.getItem("user"));
+    type User = {
+        name: string
+    }
+    const savedUser = localStorage.getItem("user")
+    const user: User | null = savedUser ? JSON.parse(savedUser) : null;
     const [person, setPerson] = useState([{
         id: Date.now(),
-        name: user.name
+        name: user ? user.name : ""
     }]);
 
     const [personInput, setPersonInput] = useState("");
 
-    const [editingTripId, setEditingTripId] = useState(null);
+    const [editingTripId, setEditingTripId] = useState<number | null>(null);
     const [showUndo, setShowUndo] = useState(false);
 
     function addPerson() {
@@ -54,24 +57,28 @@ function MyTravels() {
         setPersonInput("");
     }
 
-    function deletePerson(id) {
+    function deletePerson(id: number) {
         setPerson((prev) => prev.filter((person) => person.id !== id))
     }
 
 
-    function handleSelectCard(e) {
-        setCountry(e.target.value)
+    function handleSelectCard(e: React.ChangeEvent<HTMLSelectElement>) {
+        const value = e.target.value
+        setCountry(value)
     }
-    function handleBudget(e) {
-        setBudget(e.target.value)
-    }
-
-    function handlePersonInput(e) {
-        setPersonInput(e.target.value)
+    function handleBudget(e: React.ChangeEvent<HTMLInputElement>) {
+        const value = e.target.value
+        setBudget(value)
     }
 
-    function selectCountry(e) {
-        setFilterCountry(e.target.value)
+    function handlePersonInput(e: React.ChangeEvent<HTMLInputElement>) {
+        const value = e.target.value
+        setPersonInput(value)
+    }
+
+    function selectCountry(e: React.ChangeEvent<HTMLSelectElement>) {
+        const value = e.target.value
+        setFilterCountry(value)
     }
 
 
@@ -89,13 +96,16 @@ function MyTravels() {
             return;
         }
 
-        if (editingTripId) {
+        if (editingTripId !== null) {
+
+            const oldTrip = state.trips.find( (trip) => trip.id === editingTripId);
 
             const updatedTrip = {
                 id: editingTripId,
                 country,
                 people: person,
                 budget: Number(budget),
+                expenses: oldTrip ? oldTrip.expenses : []
             };
 
             dispatch({
@@ -126,12 +136,12 @@ function MyTravels() {
         setPersonInput("");
         setPerson([{
             id: Date.now(),
-            name: user.name
+            name: user ? user.name : ""
         }])
 
 
     }
-    function deleteTrip(id) {
+    function deleteTrip(id: number) {
         dispatch({
             type: "deleteTrip",
             payload: id
@@ -153,11 +163,11 @@ function MyTravels() {
 
     };
 
-    function editTrip(trip) {
+    function editTrip(trip: Trip) {
         setEditingTripId(trip.id);
 
         setCountry(trip.country);
-        setBudget(trip.budget);
+        setBudget(String(trip.budget));
         setPerson(trip.people);
 
         setIsModalOpen(true);
