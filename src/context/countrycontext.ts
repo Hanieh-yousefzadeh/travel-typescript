@@ -5,6 +5,7 @@ export type Country = {
     capital: string;
     numericCode: string;
     flags :{ png:string } ;
+    latlng :[number ,number]
 }
 type CountryContextType = {
     countries: Country[];

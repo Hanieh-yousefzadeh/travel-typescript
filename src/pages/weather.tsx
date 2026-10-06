@@ -1,14 +1,14 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Heart, Thermometer, Wind, Droplet } from "lucide-react"
 import { useParams } from "react-router";
-import { CountryContext } from "../context/countrycontext";
-import { AuthContext } from "../context/authcontect";
+import { useCountryContext } from "../context/countrycontext";
+import { useAuthContext } from "../context/authcontect";
 
 function Weather() {
 
     const { id } = useParams();
-    const { countries, favorites, setFavorites } = useContext(CountryContext);
-    const { user } = useContext(AuthContext)
+    const { countries, favorites, setFavorites } = useCountryContext()
+    const { user } = useAuthContext()
     // console.log(id)
     const country = countries.find((country) => country.numericCode === id);
 
@@ -20,7 +20,14 @@ function Weather() {
     // console.log(latitude);
     // console.log(longitude);
 
-    const [weather, setWeather] = useState(null)
+    type Weather = {
+        current: {
+            temperature_2m: number;
+            wind_speed_10m: number;
+            relative_humidity_2m: number;
+        }
+    }
+    const [weather, setWeather] = useState<Weather | null>(null)
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
 
@@ -29,7 +36,7 @@ function Weather() {
     useEffect(() => {
 
         if (!country || !country.latlng) {
-             setError("Weather information is not available for this country");
+            setError("Weather information is not available for this country");
             return;
         }
         const latitude = country.latlng[0];
@@ -57,7 +64,7 @@ function Weather() {
         }; getWeather()
     }, [country])
 
-    if (!country ) {
+    if (!country) {
         return <h1 className="h-160 flex justify-center items-center text-xl gap-3"><span className="loading loading-spinner loading-xl"></span></h1>
     }
 
@@ -77,6 +84,9 @@ function Weather() {
         if (!user) {
             setShowModal(true)
             return
+        }
+        if (!country) {
+            return;
         }
         if (isFavorite) {
             const newFavorites = favorites.filter((favorite) => (favorite.numericCode !== country.numericCode))

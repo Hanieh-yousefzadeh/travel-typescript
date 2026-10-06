@@ -1,6 +1,6 @@
 import { createContext ,useContext,type Dispatch , type SetStateAction } from "react";
 
-type User ={
+export type User ={
     name :string;
     family : string;
     email :string;

@@ -26,6 +26,7 @@
     // "noFallthroughCasesInSwitch": true,
     // "noPropertyAccessFromIndexSignature": true,
     // Recommended Options
+    "noImplicitAny": true,
     "strict": true,
     "noEmit": true,
     "jsx": "react-jsx",
