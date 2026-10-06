@@ -1,10 +1,12 @@
-import { useContext } from "react";
-import { AuthContext } from "../context/authcontect";
+import { useAuthContext} from "../context/authcontect";
 import { CircleUserRound } from "lucide-react"
 
 function Profile() {
-    const { user } = useContext(AuthContext)
-    console.log(user);
+    const { user } = useAuthContext()
+    // console.log(user);
+    if(!user){
+        return null;
+    }
 
     return (
         <section className="min-h-159 flex flex-col sm:pt-20 pt-10 items-center bg-[#e9f2e95e]">
