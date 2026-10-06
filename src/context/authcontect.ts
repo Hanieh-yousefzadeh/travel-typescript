@@ -1,4 +1,4 @@
-import { createContext ,type Dispatch , type SetStateAction } from "react";
+import { createContext ,useContext,type Dispatch , type SetStateAction } from "react";
 
 type User ={
     name :string;
@@ -12,3 +12,11 @@ type AuthContextType = {
 }
 
 export const AuthContext = createContext<AuthContextType | null > (null);
+
+export function useAuthContext(){
+    const context = useContext(AuthContext)
+    if (!context){
+        throw new Error("useAuthContext must be used inside AuthProvider")
+    }
+    return context;
+}
