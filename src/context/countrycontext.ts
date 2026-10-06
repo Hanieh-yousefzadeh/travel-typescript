@@ -1,10 +1,10 @@
 import { createContext, useContext, type Dispatch, type SetStateAction } from "react";
 
-type Country = {
+export type Country = {
     name: string;
     capital: string;
     numericCode: string;
-    flag: string;
+    flags :{ png:string } ;
 }
 type CountryContextType = {
     countries: Country[];
