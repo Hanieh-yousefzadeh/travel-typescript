@@ -1,6 +1,6 @@
 import { createContext, useReducer,useContext, useEffect, type Dispatch ,type ReactNode } from "react";
 
-type Expense = {
+export type Expense = {
     id: number;
     title: string;
     category: string;
