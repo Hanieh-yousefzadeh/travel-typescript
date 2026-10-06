@@ -1,9 +1,74 @@
-import { createContext, useReducer, useEffect } from "react";
-export const TripContext = createContext();
+import { createContext, useReducer, useEffect, type Dispatch ,type ReactNode } from "react";
 
-const initialState = { trips: JSON.parse(localStorage.getItem("trips")) || [], deletedTrips: null, deletedExpenses: null };
+type Expense = {
+    id: number;
+    title: string;
+    category: string;
+    amount: number;
+    paidBy: string
+}
 
-function reducer(state, action) {
+
+type Trip = {
+    id: number;
+    country: string;
+    people: string[];
+    budget: number;
+    expenses: Expense[]
+}
+
+type State = {
+    trips: Trip[];
+    deletedTrips: Trip[] | null;
+    deletedExpenses: {
+        tripId: number;
+        expenses: Expense[];
+    } | null
+}
+
+type Action =
+    | { type: "addTrip"; payload: Trip }
+    | { type: "deleteAllTrips" }
+    | { type: "undoDeleteAllTrips" }
+    | { type: "editTrip"; payload: Trip }
+    | { type: "deleteTrip"; payload: number }
+    | {type: "addExpense";
+        payload: {
+            tripId: number;
+            expense: Expense
+        }
+    }
+    | { type: "deleteExpense";
+        payload: {
+            tripId: number;
+            expenseId: number
+        }
+    }
+    | {type: "editExpense";
+        payload: {
+            tripId: number;
+            expense: Expense
+        }
+    }
+    | { type: "deleteAllExpenses" ; 
+        payload :{
+            tripId: number;
+        }}
+    | { type: "undoDeleteAllExpenses" }
+
+type TripContextType = {
+    state: State;
+    dispatch: Dispatch<Action>
+}
+export const TripContext = createContext<TripContextType | null>(null);
+const savedTrips = localStorage.getItem("trips")
+const initialState: State = {
+    trips: savedTrips ? JSON.parse(savedTrips) as Trip[] : [],
+    deletedTrips: null,
+    deletedExpenses: null
+};
+
+function reducer(state: State, action: Action): State {
     switch (action.type) {
         case "addTrip": {
             return {
@@ -58,7 +123,9 @@ function reducer(state, action) {
         }
         case "deleteAllExpenses": {
             const trip = state.trips.find((trip) => trip.id === action.payload.tripId)
-
+                if(!trip){
+                    return state;
+                }
             return {
                 ...state,
 
@@ -73,14 +140,17 @@ function reducer(state, action) {
             };
         }
         case "undoDeleteAllExpenses": {
-
+                if(!state.deletedExpenses){
+                    return state;
+                }
+                const deletedExpenses = state.deletedExpenses
             return {
                 ...state,
 
-                trips: state.trips.map((trip) => trip.id === state.deletedExpenses.tripId ? {
-                            ...trip,
-                            expenses: state.deletedExpenses.expenses
-                        } : trip
+                trips: state.trips.map((trip) => trip.id === deletedExpenses.tripId ? {
+                    ...trip,
+                    expenses: deletedExpenses.expenses
+                } : trip
                 ), deletedExpenses: null
             };
         }
@@ -90,7 +160,7 @@ function reducer(state, action) {
 
 
 
-export function TripProvider({ children }) {
+export function TripProvider({ children} :{ children: ReactNode }) {
     const [state, dispatch] = useReducer(
         reducer,
         initialState
