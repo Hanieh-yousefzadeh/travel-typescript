@@ -5,22 +5,24 @@ import Weather from "./pages/weather";
 import Login from "./pages/login";
 import Profile from "./pages/profile";
 import MyTrip from "./pages/mytrip";
-import { CountryContext } from "./context/countrycontext";
+import { CountryContext ,type Country} from "./context/countrycontext";
 import Header from "./components/header";
 import Footer from "./components/footer";
-import {AuthContext } from "./context/authcontect";
+import {AuthContext ,type User } from "./context/authcontect";
 import MyTravels from "./pages/mytravels";
 import TripDetails from "./pages/tripDetails";
 
 function App() {
 
-  const [user, setUser] = useState(() => {
-    return JSON.parse(localStorage.getItem("user")) || null
+  const [user, setUser] = useState<User | null>(() => {
+    const savedUser =localStorage.getItem("user")
+    return savedUser? JSON.parse(savedUser) as User : null
   })
-  const [countries, setCountries] = useState([]);
+  const [countries, setCountries] = useState<Country[]>([]);
 
-  const [favorites, setFavorites] = useState(() => {
-    return JSON.parse(localStorage.getItem("favorites")) || []
+  const [favorites, setFavorites] = useState< Country[]>(() => {
+    const savedFavorites = localStorage.getItem("favorites")
+    return savedFavorites ? JSON.parse(savedFavorites) as Country[] : []
   });
 
   useEffect(() => {

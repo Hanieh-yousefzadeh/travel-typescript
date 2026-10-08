@@ -1,6 +1,6 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useParams } from "react-router";
-import { TripContext } from "../context/tripcontext";
+import { useTripContext, type Expense } from "../context/tripcontext";
 import { categories } from "../data/categoris";
 import { Trash, PencilSparkles, Ticket, Banknote } from "lucide-react"
 
@@ -8,7 +8,7 @@ import { Trash, PencilSparkles, Ticket, Banknote } from "lucide-react"
 function TripDetails() {
 
     const { tripId } = useParams();
-    const { state, dispatch } = useContext(TripContext);
+    const { state, dispatch } = useTripContext();
     // console.log(tripId);
     // console.log(state.trips);
 
@@ -18,7 +18,7 @@ function TripDetails() {
     const [expenseCategory, setExpenseCategory] = useState("");
     const [expenseAmount, setExpenseAmount] = useState("");
     const [expensePaidBy, setExpensePaidBy] = useState("");
-    const [editingExpenseId, setEditingExpenseId] = useState(null);
+    const [editingExpenseId, setEditingExpenseId] = useState<number | null>(null);
     const [selectedCategory, setSelectedCategory] = useState("all");
     const [selectedPerson, setSelectedPerson] = useState("all");
     const [showUndo, setShowUndo] = useState(false);
@@ -29,27 +29,33 @@ function TripDetails() {
     function closeModal() {
         setIsExpenseModalOpen(false)
     }
-    function inputExpenseTitle(e) {
-        setExpenseTitle(e.target.value)
+    function inputExpenseTitle(e: React.ChangeEvent<HTMLInputElement>) {
+        const value = e.target.value
+        setExpenseTitle(value)
     }
 
-    function handleExpenseCategory(e) {
-        setExpenseCategory(e.target.value)
+    function handleExpenseCategory(e: React.ChangeEvent<HTMLSelectElement>) {
+        const value = e.target.value
+        setExpenseCategory(value)
     }
 
-    function handleExpenseAmount(e) {
-        setExpenseAmount(e.target.value)
+    function handleExpenseAmount(e: React.ChangeEvent<HTMLInputElement>) {
+        const value = e.target.value
+        setExpenseAmount(value)
     }
 
-    function handleExpensePaidBy(e) {
-        setExpensePaidBy(e.target.value)
+    function handleExpensePaidBy(e: React.ChangeEvent<HTMLSelectElement>) {
+        const value = e.target.value
+        setExpensePaidBy(value)
     }
-    function selectCategory(e) {
-        setSelectedCategory(e.target.value)
+    function selectCategory(e: React.ChangeEvent<HTMLSelectElement>) {
+        const value = e.target.value
+        setSelectedCategory(value)
         setSelectedPerson("all")
     }
-    function selectPerson(e) {
-        setSelectedPerson(e.target.value)
+    function selectPerson(e: React.ChangeEvent<HTMLSelectElement>) {
+        const value = e.target.value
+        setSelectedPerson(value)
         setSelectedCategory("all")
     }
 
@@ -98,7 +104,7 @@ function TripDetails() {
         dispatch({
             type: editingExpenseId !== null ? "editExpense" : "addExpense",
             payload: {
-                tripId: trip.id,
+                tripId: Number(tripId),
                 expense: newExpense
             }
         });
@@ -112,14 +118,14 @@ function TripDetails() {
         setIsExpenseModalOpen(false);
     }
 
-    const totalExpenses = (trip.expenses || []).reduce((total, expense) => total + expense.amount, 0);
+    const totalExpenses = trip.expenses.reduce((total, expense) => total + expense.amount, 0);
     const remainingBudget = trip.budget - totalExpenses;
 
-    function deleteExpense(expenseId) {
+    function deleteExpense(expenseId: number) {
         dispatch({
             type: "deleteExpense",
             payload: {
-                tripId: trip.id,
+                tripId: Number(tripId),
                 expenseId: expenseId
             }
         });
@@ -129,7 +135,7 @@ function TripDetails() {
         dispatch({
             type: "deleteAllExpenses",
             payload: {
-                tripId: trip.id
+                tripId: Number(tripId),
             }
         })
         setShowUndo(true);
@@ -137,12 +143,12 @@ function TripDetails() {
             setShowUndo(false);
         }, 3000);
     }
-    function editExpense(expense) {
+    function editExpense(expense: Expense) {
         setEditingExpenseId(expense.id);
 
         setExpenseTitle(expense.title);
         setExpenseCategory(expense.category);
-        setExpenseAmount(expense.amount);
+        setExpenseAmount(String(expense.amount));
         setExpensePaidBy(expense.paidBy);
 
         setIsExpenseModalOpen(true);

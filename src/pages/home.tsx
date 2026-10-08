@@ -1,18 +1,19 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router";
-import { CountryContext } from "../context/countrycontext";
+import {useCountryContext ,type Country} from "../context/countrycontext";
 import Hero from "../components/hero";
 import { Search, X } from "lucide-react"
 
 function Home() {
-    const { countries } = useContext(CountryContext)
+    const { countries } = useCountryContext()
     const [search, setSearch] = useState("")
-    const [result, setResult] = useState([])
+    const [result, setResult] = useState<Country[]>([])
 
-    function handleSearch(e) {
-        setSearch(e.target.value)
+    function handleSearch(e:React.ChangeEvent<HTMLInputElement>) {
+        const value = e.target.value
+        setSearch(value)
         const searchedCountries = countries.filter((country) => (
-            country.name.toLowerCase().includes(search.toLowerCase())
+            country.name.toLowerCase().includes(value.toLowerCase())
         ))
         setResult(searchedCountries)
     }

@@ -1,15 +1,14 @@
-import { useContext, useState } from "react";
+import { useState, } from "react";
 import { Link, useNavigate, NavLink } from "react-router";
-import { AuthContext } from "../context/authcontect";
-import { UserRound, Heart, TextAlignJustify, X, MapPinned ,Tickets} from "lucide-react"
-import { CountryContext } from "../context/countrycontext";
+import { useAuthContext } from "../context/authcontect";
+import { UserRound, Heart, TextAlignJustify, X, MapPinned, Tickets } from "lucide-react"
+import { useCountryContext } from "../context/countrycontext";
 
 function Header() {
 
     const navigate = useNavigate();
-
-    const { user, setUser } = useContext(AuthContext)
-    const { favorites, setFavorites } = useContext(CountryContext)
+    const { user, setUser } = useAuthContext()
+    const { favorites, setFavorites } = useCountryContext()
     function handelLog() {
         setUser(null)
         setFavorites([])

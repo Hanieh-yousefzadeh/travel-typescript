@@ -1,9 +1,8 @@
-import { useContext } from "react";
-import { CountryContext } from "../context/countrycontext";
+import { useCountryContext } from "../context/countrycontext";
 import { Link } from "react-router";
 
 function MyTrip() {
-    const { favorites } = useContext(CountryContext)
+    const { favorites } = useCountryContext()
     console.log(favorites);
     return (
         <section className="flex justify-center min-h-180 bg-[#cee1cd71]">
